@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_lab1/model/Product_model.dart';
+// import 'package:flutter_lab1/controllers/Product_service.dart';
+// import 'package:flutter_lab1/controllers/auth_sevice.dart';
+// import 'package:flutter_lab1/model/user_model.dart';
+import 'package:flutter_lab1/provider/user_provider.dart';
+import 'package:provider/provider.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -8,56 +14,52 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  String? myname;
-  String? A_token;
-  String? R_token;
 
-  void loadData() async {
-    final SharedPreferences data_DB = await SharedPreferences.getInstance();
-    setState(() {
-      myname = data_DB.getString('Myname');
-      A_token = data_DB.getString('A_token');
-      R_token = data_DB.getString('R_token');
-    });
-  }
+    // Sample data for the DataTable
+  List<Product> _products = [];
+  bool _isLoading = true;
+  int index = 0;
 
-  void removeData() async {
-    final SharedPreferences data_DB = await SharedPreferences.getInstance();
-    await data_DB.remove('Myname');
-    await data_DB.remove('A_token');
-    await data_DB.remove('R_token');
+  // String? myname;
+  // String? A_token;
+  // String? R_token;
+
+  // void loadData() async {
+  //   final SharedPreferences data_DB = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     myname = data_DB.getString('Myname');
+  //     A_token = data_DB.getString('A_token');
+  //     R_token = data_DB.getString('R_token');
+  //   });
+  // }
+
+  // void removeData() async {
+  //   final SharedPreferences data_DB = await SharedPreferences.getInstance();
+  //   await data_DB.remove('Myname');
+  //   await data_DB.remove('A_token');
+  //   await data_DB.remove('R_token');
+  // }
+
+  void _fatchAllProduct()async{
+    try {
+         final productService = ProductService();
+      List<Product> products = await productService.getproducts();
+      setState(() {
+        _products = products;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+    }
+
   }
 
   @override
   void initState() {
-    loadData();
+    // loadData();
+    _fatchAllProduct();
     super.initState();
   }
-
-  // Sample data for the DataTable
-  final List<Map<String, dynamic>> products = [
-    {
-      'ID': 1,
-      'product_name': 'Product A',
-      'product_type': 'Type 1',
-      'price': 10.0,
-      'unit': 'pcs'
-    },
-    {
-      'ID': 2,
-      'product_name': 'Product B',
-      'product_type': 'Type 2',
-      'price': 20.0,
-      'unit': 'pcs'
-    },
-    {
-      'ID': 3,
-      'product_name': 'Product C',
-      'product_type': 'Type 3',
-      'price': 30.0,
-      'unit': 'pcs'
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -67,20 +69,40 @@ class _UserPageState extends State<UserPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            Text('Welcome ${myname ?? 'Unknown'} to User Page'),
-            SizedBox(height: 20),
+            Text('This is ProductPage'),
+            // Text('Welcome ${myname ?? 'Unknown'} to User Page'),
+            const SizedBox(height: 20),
+            Text("AccessToken"),
+            const SizedBox(height: 20),
+            Text(context.read<UserProvider>().accessToken),
+            const SizedBox(height: 20),
+            Text("refreashToken"),
+            const SizedBox(height: 20),
+            Text(
+              context.watch<UserProvider>().refreshToken!,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              child: Text('Update Token'),
+              onPressed: () async{
+                final refreshToken = context.read<UserProvider>().refreshToken;
+                print(refreshToken);
+                // await AuthService()
+              },
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
               child: Text('Post'),
               onPressed: () {
                 Navigator.pushNamed(context, '/post_page');
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  columns: [
+                  columns: const [
                     DataColumn(label: Text('ID')),
                     DataColumn(label: Text('Product Name')),
                     DataColumn(label: Text('Product Type')),
@@ -88,23 +110,24 @@ class _UserPageState extends State<UserPage> {
                     DataColumn(label: Text('Unit')),
                     DataColumn(label: Text('Action')),
                   ],
-                  rows: products.map((product) {
+                  rows: _products.map((product) {
                     return DataRow(cells: [
-                      DataCell(Text(product['ID'].toString())),
-                      DataCell(Text(product['product_name'])),
-                      DataCell(Text(product['product_type'])),
-                      DataCell(Text('\$${product['price']}')),
-                      DataCell(Text(product['unit'])),
+                      DataCell(Text("${index+1}")),
+                      DataCell(Text("${product.product.productName}")),
+                      DataCell(Text("${product.product.productType}")),
+                      DataCell(Text("${product.product.price}")),
+                      DataCell(Text("${product.product.unit}")),
+
                       DataCell(Row(
                         children: [
                           IconButton(
-                            icon: Icon(Icons.edit),
+                            icon: const Icon(Icons.edit),
                             onPressed: () {
                               Navigator.pushNamed(context, '/edit_page');
                             },
                           ),
                           IconButton(
-                            icon: Icon(Icons.delete),
+                            icon: const Icon(Icons.delete),
                             onPressed: () {
                               //del();
                             },
@@ -116,11 +139,11 @@ class _UserPageState extends State<UserPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               child: Text('Logout'),
               onPressed: () {
-                removeData();
+                // removeData();
                 Navigator.pushNamed(context, '/');
               },
             ),

@@ -55,29 +55,30 @@ class _post_productState extends State<post_product> {
     }
   }
 
-  String? myname;
-  String? A_token;
-  String? R_token;
+  // String? myname;
+  // String? A_token;
+  // String? R_token;
 
-  void loadData() async {
-    final SharedPreferences data_DB = await SharedPreferences.getInstance();
-    setState(() {
-      myname = data_DB.getString('Myname');
-      A_token = data_DB.getString('A_token');
-      R_token = data_DB.getString('R_token');
-    });
-  }
+  // void loadData() async {
+  //   final SharedPreferences data_DB = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     myname = data_DB.getString('Myname');
+  //     A_token = data_DB.getString('A_token');
+  //     R_token = data_DB.getString('R_token');
+  //   });
+  // }
 
-  @override
-  void initState() {
-    loadData();
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   loadData();
+  //   super.initState();
+  // }
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome ${myname ?? 'UnKnown'} to Post Product'),
+        // title: Text('Welcome ${myname ?? 'UnKnown'} to Post Product'),
+         title: Text('Welcome'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

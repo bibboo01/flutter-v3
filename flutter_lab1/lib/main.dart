@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/page/edit_page.dart';
 import 'package:flutter_lab1/page/post_page.dart';
+import 'package:flutter_lab1/provider/user_provider.dart';
+import 'package:provider/provider.dart';
 import './page/homepage.dart';
 import './page/register_page.dart';
 import './page/login_page.dart';
@@ -8,7 +10,11 @@ import './page/admin_page.dart';
 import './page/user_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(create: (context)=> UserProvider(),
+        child: MyApp()
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

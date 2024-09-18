@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/auth_sevice.dart';
 import 'package:flutter_lab1/model/user_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_lab1/provider/user_provider.dart';
+import 'package:provider/provider.dart';
+
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -21,10 +24,12 @@ class _LoginPageState extends State<LoginPage> {
       try {
         final User? UserModel = await AuthService().login(username, password);
 
-        final SharedPreferences data_DB = await SharedPreferences.getInstance();
-        await data_DB.setString('A_token', UserModel!.token.accessToken);
-        await data_DB.setString('R_token', UserModel.token.refreshToken);
-        await data_DB.setString('Myname', UserModel.user.name);
+        Provider.of<UserProvider>(context,listen: false).saveUser(UserModel!.user,UserModel.token);
+
+        // final SharedPreferences data_DB = await SharedPreferences.getInstance();
+        // await data_DB.setString('A_token', UserModel!.token.accessToken);
+        // await data_DB.setString('R_token', UserModel.token.refreshToken);
+        // await data_DB.setString('Myname', UserModel.user.name);
 
         final String? role = UserModel.user.role;
 

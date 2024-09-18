@@ -7,6 +7,9 @@ class ProductService {
   Future<List<Product>> getproducts() async {
     final response = await http.get(
       Uri.parse("$apiURL/api/products"),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     );
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
@@ -16,9 +19,9 @@ class ProductService {
     }
   }
 
-  Future<Product> getproduct(String _id) async {
+  Future<Product> getproduct(String id) async {
     final response = await http.get(
-      Uri.parse("$apiURL/api/product/$_id"),
+      Uri.parse("$apiURL/api/product/$id"),
     );
     return Product.fromJson(jsonDecode(response.body));
   }
