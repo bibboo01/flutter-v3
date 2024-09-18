@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
+import 'package:flutter_lab1/controllers/auth_sevice.dart';
 import 'package:flutter_lab1/model/Product_model.dart';
-// import 'package:flutter_lab1/controllers/Product_service.dart';
-// import 'package:flutter_lab1/controllers/auth_sevice.dart';
-// import 'package:flutter_lab1/model/user_model.dart';
 import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -14,50 +11,28 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-
-    // Sample data for the DataTable
-  List<Product> _products = [];
+  // Sample data for the DataTable
+  List<productModel> _products = [];
   bool _isLoading = true;
-  int index = 0;
+  String? _errorMessage;
 
-  // String? myname;
-  // String? A_token;
-  // String? R_token;
-
-  // void loadData() async {
-  //   final SharedPreferences data_DB = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     myname = data_DB.getString('Myname');
-  //     A_token = data_DB.getString('A_token');
-  //     R_token = data_DB.getString('R_token');
-  //   });
-  // }
-
-  // void removeData() async {
-  //   final SharedPreferences data_DB = await SharedPreferences.getInstance();
-  //   await data_DB.remove('Myname');
-  //   await data_DB.remove('A_token');
-  //   await data_DB.remove('R_token');
-  // }
-
-  void _fatchAllProduct()async{
+  void _fetchAllProducts() async {
     try {
-         final productService = ProductService();
-      List<Product> products = await productService.getproducts();
+      final allProduct = await ProductService().getProducts();
       setState(() {
-        _products = products;
+        _products = allProduct;
         _isLoading = false;
       });
     } catch (e) {
-      print(e);
+      setState(() {
+        _isLoading = false; // Set loading to false
+      });
     }
-
   }
 
   @override
   void initState() {
-    // loadData();
-    _fatchAllProduct();
+    _fetchAllProducts();
     super.initState();
   }
 
@@ -70,26 +45,6 @@ class _UserPageState extends State<UserPage> {
         child: Column(
           children: <Widget>[
             Text('This is ProductPage'),
-            // Text('Welcome ${myname ?? 'Unknown'} to User Page'),
-            const SizedBox(height: 20),
-            Text("AccessToken"),
-            const SizedBox(height: 20),
-            Text(context.read<UserProvider>().accessToken),
-            const SizedBox(height: 20),
-            Text("refreashToken"),
-            const SizedBox(height: 20),
-            Text(
-              context.watch<UserProvider>().refreshToken!,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              child: Text('Update Token'),
-              onPressed: () async{
-                final refreshToken = context.read<UserProvider>().refreshToken;
-                print(refreshToken);
-                // await AuthService()
-              },
-            ),
             const SizedBox(height: 20),
             ElevatedButton(
               child: Text('Post'),
@@ -99,57 +54,83 @@ class _UserPageState extends State<UserPage> {
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('ID')),
-                    DataColumn(label: Text('Product Name')),
-                    DataColumn(label: Text('Product Type')),
-                    DataColumn(label: Text('Price')),
-                    DataColumn(label: Text('Unit')),
-                    DataColumn(label: Text('Action')),
-                  ],
-                  rows: _products.map((product) {
-                    return DataRow(cells: [
-                      DataCell(Text("${index+1}")),
-                      DataCell(Text("${product.product.productName}")),
-                      DataCell(Text("${product.product.productType}")),
-                      DataCell(Text("${product.product.price}")),
-                      DataCell(Text("${product.product.unit}")),
-
-                      DataCell(Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/edit_page');
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              //del();
-                            },
-                          ),
-                        ],
-                      )),
-                    ]);
-                  }).toList(),
-                ),
-              ),
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator()) // Loading indicator
+                  : _errorMessage != null
+                      ? Center(
+                          child: Text('Error: $_errorMessage')) // Error message
+                      : ListView.builder(
+                          itemCount: _products.length,
+                          itemBuilder: (context, index) {
+                            final product = _products[index];
+                            return ListTile(
+                              title: Text(product.productName),
+                              subtitle: Text(
+                                "Type: ${product.productType} | Price: ${product.price} | Unit: ${product.unit}",
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/edit_page',
+                                        arguments: product,
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {
+                                      // Implement delete logic here
+                                      _deleteProduct(product.id);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               child: Text('Logout'),
               onPressed: () {
-                // removeData();
-                Navigator.pushNamed(context, '/');
+                Logout();
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  // Example delete method
+  void _deleteProduct(String productId) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    String? token = userProvider.accessToken;
+
+    // Check if the access token is empty
+    // if (token == null || token.isEmpty) {
+    //   token = await AuthService().refreshToken(userProvider.refreshToken);
+    //   userProvider.updateAccessToken(token!);
+    // }
+
+    try {
+      await ProductService().deleteProduct(productId,
+          userProvider.accessToken); // Replace with actual delete method
+      _fetchAllProducts(); // Refresh the product list
+    } catch (e) {
+      print(e); // Handle error as needed
+    }
+  }
+
+  void Logout() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.onLogout();
+    Navigator.pushNamed(context, '/');
   }
 }

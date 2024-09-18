@@ -11,9 +11,7 @@ import './page/user_page.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(create: (context)=> UserProvider(),
-        child: MyApp()
-    ),
+    ChangeNotifierProvider(create: (context) => UserProvider(), child: MyApp()),
   );
 }
 
@@ -33,7 +31,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/admin_page': (context) => AdminPage(),
         '/user_page': (context) => UserPage(),
-        '/edit_page': (context) => edit_page(),
+        '/edit_page': (context) => EditPage(),
         '/post_page': (context) => post_product(),
       },
     );

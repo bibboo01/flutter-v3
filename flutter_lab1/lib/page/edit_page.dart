@@ -1,50 +1,87 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
+import 'package:flutter_lab1/controllers/auth_sevice.dart';
 import 'package:flutter_lab1/model/Product_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_lab1/provider/user_provider.dart';
+import 'package:provider/provider.dart';
 
-class edit_page extends StatefulWidget {
+class EditPage extends StatefulWidget {
   @override
-  _edit_pageState createState() => _edit_pageState();
+  _EditPageState createState() => _EditPageState();
 }
 
-class _edit_pageState extends State<edit_page> {
+class _EditPageState extends State<EditPage> {
   final _formKey = GlobalKey<FormState>();
+
+  String? productId;
+
   final _productNameController = TextEditingController();
   final _productTypeController = TextEditingController();
   final _priceController = TextEditingController();
   final _unitController = TextEditingController();
 
-  String? product_name;
-  String? product_type;
-  int? price;
-  String? unit;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final product = ModalRoute.of(context)!.settings.arguments
+        as productModel; // Change here
+    _fetchProduct(product.id);
+  }
 
-  // String? myname;
-  // String? A_token;
-  // String? R_token;
+  void _fetchProduct(String id) async {
+    if (id.isNotEmpty) {
+      final data = await ProductService().getproduct(id);
+      _productNameController.text = data.productName;
+      _productTypeController.text = data.productType;
+      _priceController.text = data.price.toString();
+      _unitController.text = data.unit;
+    }
+  }
 
-  // void loadData() async {
-  //   final SharedPreferences data_DB = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     myname = data_DB.getString('Myname');
-  //     A_token = data_DB.getString('A_token');
-  //     R_token = data_DB.getString('R_token');
-  //   });
-  // }
+  void _updateProduct(String id) async {
+    if (_formKey.currentState!.validate()) {
+      final product_name = _productNameController.text;
+      final product_type = _productTypeController.text;
+      final priceString = _priceController.text;
+      final unit = _unitController.text;
 
-  // @override
-  // void initState() {
-  //   loadData();
-  //   super.initState();
-  // }
+      // Try parsing the price and handle potential null values
+      final price = int.tryParse(priceString);
+      if (price == null) {
+        // Show an error message if the price is invalid
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please enter a valid price.')),
+        );
+        return;
+      }
+      // Access the token from UserProvider here
+      // Access the token from UserProvider here
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      String? token = userProvider.accessToken;
+
+      // Check if the access token is empty
+      // if (token == null || token.isEmpty) {
+      //   token = await AuthService().refreshToken(userProvider.refreshToken);
+      //   userProvider.updateAccessToken(token!);
+      // }
+
+      try {
+        // Call the update method in the ProductService
+        await ProductService()
+            .updateProduct(id, product_name, product_type, price, unit, token);
+        // Navigate back after successful update
+        Navigator.pushNamed(context, '/user_page');
+      } catch (e) {
+        // Handle any errors during the update process
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Update failed: $e')),
+        );
+      }
+    }
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text('Welcome ${myname ?? 'UnKnown'} to Edit Product'),
         title: Text('Welcome'),
       ),
       body: Padding(
@@ -107,13 +144,10 @@ class _edit_pageState extends State<edit_page> {
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Process the data
-                      print('Product Name: ${_productNameController.text}');
-                      print('Product Type: ${_productTypeController.text}');
-                      print('Price: ${_priceController.text}');
-                      print('Unit: ${_unitController.text}');
-                    }
+                    // Process the data
+                    final product = ModalRoute.of(context)!.settings.arguments
+                        as productModel; // Change here
+                    _updateProduct(product.id);
                   },
                   child: Text('Submit'),
                 ),

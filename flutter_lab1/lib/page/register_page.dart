@@ -23,7 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
       final role = _selectedRole;
 
       try {
-        final user = await AuthService().register(username, password, role!, name);
+        await AuthService().register(username, password, role!, name);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Register successful')),
         );

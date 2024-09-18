@@ -24,12 +24,8 @@ class _LoginPageState extends State<LoginPage> {
       try {
         final User? UserModel = await AuthService().login(username, password);
 
-        Provider.of<UserProvider>(context,listen: false).saveUser(UserModel!.user,UserModel.token);
-
-        // final SharedPreferences data_DB = await SharedPreferences.getInstance();
-        // await data_DB.setString('A_token', UserModel!.token.accessToken);
-        // await data_DB.setString('R_token', UserModel.token.refreshToken);
-        // await data_DB.setString('Myname', UserModel.user.name);
+        Provider.of<UserProvider>(context, listen: false)
+            .saveUser(UserModel!.user, UserModel.token);
 
         final String? role = UserModel.user.role;
 
