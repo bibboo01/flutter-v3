@@ -4,8 +4,6 @@ import 'package:flutter_lab1/model/user_model.dart';
 import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
-// import 'package:shared_preferences/shared_preferences.dart';
-
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -29,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
         final String? role = UserModel.user.role;
 
-        _showLoginSuccessDialog(role!,UserModel.user.name);
+        _showLoginSuccessDialog(role!,role);
         _usernameController.clear();
         _passwordController.clear();
       } catch (e) {
