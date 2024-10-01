@@ -29,34 +29,71 @@ class _LoginPageState extends State<LoginPage> {
 
         final String? role = UserModel.user.role;
 
-        if (role == 'Admin') {
-          Navigator.pushReplacementNamed(context, '/admin_page');
-        } else if (role == 'User') {
-          Navigator.pushReplacementNamed(context, '/user_page');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Unknown role: $role')),
-          );
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Successful')),
-        );
+        _showLoginSuccessDialog(role!,UserModel.user.name);
         _usernameController.clear();
         _passwordController.clear();
       } catch (e) {
         print(e);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fail to Login')),
-        );
+        _showErrorDialog('Fail to Login');
       }
     }
+  }
+
+  void _showLoginSuccessDialog(String _Role,String name) {
+    if (_Role == 'Admin') {
+      Navigator.pushReplacementNamed(context, '/admin_page');
+    } else if (_Role == 'User') {
+      Navigator.pushReplacementNamed(context, '/user_page');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unknown role: $_Role')),
+      );
+    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Login Successful'),
+          content: Text('Welcome $name to Page'),
+          actions: <Widget>[
+            TextButton(
+              child: Center(child: Text('OK')),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(child: Text('Warning')),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Center(child: Text('OK')),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

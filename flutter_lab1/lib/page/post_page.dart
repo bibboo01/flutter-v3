@@ -39,12 +39,10 @@ class _post_productState extends State<post_product> {
       }
 
       try {
-        await ProductService()
-            .addProduct(context, productName, productType, price!, unit, accessToken, refreshToken);
+        await ProductService().addProduct(context, productName, productType,
+            price!, unit, accessToken, refreshToken);
+        _showDialog('Add Product Successful');
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Add Product Successful')),
-        );
         // Clear text fields after successful submission
         _productNameController.clear();
         _productTypeController.clear();
@@ -58,6 +56,26 @@ class _post_productState extends State<post_product> {
         );
       }
     }
+  }
+
+  void _showDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(child: Text('System')),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Center(child: Text('OK')),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget build(BuildContext context) {

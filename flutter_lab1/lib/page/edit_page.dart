@@ -39,6 +39,25 @@ class _EditPageState extends State<EditPage> {
       _unitController.text = data.unit;
     }
   }
+   void _showDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(child: Text('System')),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Center(child: Text('OK')),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _updateProduct(String id) async {
     if (_formKey.currentState!.validate()) {
@@ -67,6 +86,7 @@ class _EditPageState extends State<EditPage> {
             product_type, price, unit, accessToken, refreshToken);
         // Navigate back after successful update
         Navigator.pushNamed(context, '/user_page');
+        _showDialog('Edit Product Successful');
       } catch (e) {
         // Handle any errors during the update process
         ScaffoldMessenger.of(context).showSnackBar(

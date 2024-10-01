@@ -20,13 +20,16 @@ class ProductService {
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonResponse = json.decode(response.body);
-      return jsonResponse.map((product) => productModel.fromJson(product)).toList();
+      return jsonResponse
+          .map((product) => productModel.fromJson(product))
+          .toList();
     } else if (response.statusCode == 403) {
       print('Access denied, logging out.');
       Logout(context);
       throw Exception('Access denied');
     } else if (response.statusCode == 401) {
-      final newAccessToken = await AuthService().refreshToken(context, refreshToken);
+      final newAccessToken =
+          await AuthService().refreshToken(context, refreshToken);
       if (newAccessToken != null) {
         return await getProducts(context, newAccessToken, refreshToken);
       } else {
@@ -37,7 +40,7 @@ class ProductService {
     } else {
       throw Exception('Failed to load products: ${response.statusCode}');
     }
-}
+  }
 
   Future<productModel> getproduct(BuildContext context, String id,
       String accessToken, String refreshToken) async {
@@ -50,7 +53,7 @@ class ProductService {
     );
 
     print(response.statusCode);
-    
+
     if (response.statusCode == 200) {
       print('Product fetched successfully');
       return productModel.fromJson(jsonDecode(response.body));
@@ -59,7 +62,8 @@ class ProductService {
       Logout(context);
       throw Exception('Access denied');
     } else if (response.statusCode == 401) {
-      final newAccessToken = await AuthService().refreshToken(context, refreshToken);
+      final newAccessToken =
+          await AuthService().refreshToken(context, refreshToken);
       if (newAccessToken != null) {
         return await getproduct(context, id, newAccessToken, refreshToken);
       } else {
@@ -70,7 +74,7 @@ class ProductService {
     } else {
       throw Exception('Failed to fetch product: ${response.statusCode}');
     }
-}
+  }
 
   Future<void> addProduct(
       BuildContext context,
@@ -97,6 +101,7 @@ class ProductService {
     if (response.statusCode == 200) {
       print('Product Post successfully');
     } else if (response.statusCode == 403) {
+      Logout(context);
       print('logging out');
     } else if (response.statusCode == 401) {
       await AuthService().refreshToken(context, refreshToken);
@@ -123,6 +128,7 @@ class ProductService {
     if (response.statusCode != 200) {
       throw Exception('Failed to delete product');
     } else if (response.statusCode == 403) {
+      Logout(context);
       print('logging out');
     } else if (response.statusCode == 401) {
       await AuthService().refreshToken(context, refreshToken);
@@ -153,9 +159,10 @@ class ProductService {
       }),
     );
     if (response.statusCode == 200) {
-      print('Product updated successfully: ${response.body}');
+      print('Product updated successfully');
     } else if (response.statusCode == 403) {
       print('logging out');
+      Logout(context);
     } else if (response.statusCode == 401) {
       await AuthService().refreshToken(context, refreshToken);
       updateProduct(context, id, product_name, product_type, price, unit,
@@ -163,7 +170,7 @@ class ProductService {
     }
   }
 
-  void Logout(BuildContext context) {
+  Future<void> Logout(BuildContext context) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider.onLogout();
     Navigator.pushNamed(context, '/'); // Redirect to login or home page
