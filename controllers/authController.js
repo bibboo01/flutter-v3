@@ -53,12 +53,12 @@ exports.login = async (req, res) => {
         const accessToken = jwt.sign(
             { userId: user._id },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '1s' }
+            { expiresIn: '1m' }
         );
         const refreshToken = jwt.sign(
             { userId: user._id },
             process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: '5m' }
+            { expiresIn: '10m' }
         );
         res.status(200).json({ user: user, token: { accessToken, refreshToken }});
     } catch (err) {

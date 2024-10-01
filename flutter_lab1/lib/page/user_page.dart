@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
-import 'package:flutter_lab1/controllers/auth_sevice.dart';
 import 'package:flutter_lab1/model/Product_model.dart';
 import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +16,12 @@ class _UserPageState extends State<UserPage> {
   String? _errorMessage;
 
   void _fetchAllProducts() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    String? accessToken = userProvider.accessToken;
+    String? refreshToken = userProvider.refreshToken;
     try {
-      final allProduct = await ProductService().getProducts();
+      final allProduct = await ProductService()
+          .getProducts(context, accessToken, refreshToken);
       setState(() {
         _products = allProduct;
         _isLoading = false;
@@ -86,7 +89,8 @@ class _UserPageState extends State<UserPage> {
                                     icon: const Icon(Icons.delete),
                                     onPressed: () {
                                       // Implement delete logic here
-                                      _deleteProduct(product.id);
+                                      _deleteProduct(
+                                          product.id, product.productName);
                                     },
                                   ),
                                 ],
@@ -109,23 +113,49 @@ class _UserPageState extends State<UserPage> {
   }
 
   // Example delete method
-  void _deleteProduct(String productId) async {
+  void _deleteProduct(String productId, String product_name) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    String? token = userProvider.accessToken;
+    String? accessToken = userProvider.accessToken;
+    String? refreshToken = userProvider.refreshToken;
+    // Show confirmation dialog
+    bool confirmDelete = await _showConfirmationDialog(product_name);
 
-    // Check if the access token is empty
-    // if (token == null || token.isEmpty) {
-    //   token = await AuthService().refreshToken(userProvider.refreshToken);
-    //   userProvider.updateAccessToken(token!);
-    // }
-
-    try {
-      await ProductService().deleteProduct(productId,
-          userProvider.accessToken); // Replace with actual delete method
-      _fetchAllProducts(); // Refresh the product list
-    } catch (e) {
-      print(e); // Handle error as needed
+    if (confirmDelete) {
+      try {
+        await ProductService()
+            .deleteProduct(context, productId, accessToken!, refreshToken!);
+        _fetchAllProducts(); // Refresh the product list after deletion
+      } catch (e) {
+        print('Error deleting product: $e');
+      }
     }
+  }
+
+  Future<bool> _showConfirmationDialog(String product_name) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete this $product_name?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(false); // Return false if cancelled
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop(true); // Return true if confirmed
+              },
+            ),
+          ],
+        );
+      },
+    ).then((value) => value ?? false); // Ensure a boolean is returned
   }
 
   void Logout() {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
 import 'package:flutter_lab1/controllers/auth_sevice.dart';
-import 'package:flutter_lab1/model/user_model.dart';
 import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -23,23 +22,25 @@ class _post_productState extends State<post_product> {
       final productType = _productTypeController.text;
       final priceString = _priceController.text;
       final unit = _unitController.text;
-
       // Convert price to int
       final int? price = int.tryParse(priceString);
 
-      // Access the token from UserProvider here
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      String? token = userProvider.accessToken;
+      String? accessToken = userProvider.accessToken;
+      String? refreshToken = userProvider.refreshToken;
 
-      // Check if the access token is empty
-      // if (token == null || token.isEmpty) {
-      //   token = await AuthService().refreshToken(userProvider.refreshToken);
-      //   userProvider.updateAccessToken(token!);
-      // }
+      String? newToken =
+          await AuthService().refreshToken(context, refreshToken);
+      if (newToken != null) {
+        userProvider.updateAccessToken(newToken);
+        accessToken = newToken;
+      } else {
+        print('Failed to refresh token.');
+      }
 
       try {
         await ProductService()
-            .addProduct(productName, productType, price!, unit, token!);
+            .addProduct(context, productName, productType, price!, unit, accessToken, refreshToken);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Add Product Successful')),

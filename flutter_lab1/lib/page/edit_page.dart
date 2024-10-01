@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
-import 'package:flutter_lab1/controllers/auth_sevice.dart';
 import 'package:flutter_lab1/model/Product_model.dart';
 import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -28,8 +27,12 @@ class _EditPageState extends State<EditPage> {
   }
 
   void _fetchProduct(String id) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    String? accessToken = userProvider.accessToken;
+    String? refreshToken = userProvider.refreshToken;
     if (id.isNotEmpty) {
-      final data = await ProductService().getproduct(id);
+      final data = await ProductService()
+          .getproduct(context, id, accessToken, refreshToken);
       _productNameController.text = data.productName;
       _productTypeController.text = data.productType;
       _priceController.text = data.price.toString();
@@ -54,20 +57,14 @@ class _EditPageState extends State<EditPage> {
         return;
       }
       // Access the token from UserProvider here
-      // Access the token from UserProvider here
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      String? token = userProvider.accessToken;
-
-      // Check if the access token is empty
-      // if (token == null || token.isEmpty) {
-      //   token = await AuthService().refreshToken(userProvider.refreshToken);
-      //   userProvider.updateAccessToken(token!);
-      // }
+      String? accessToken = userProvider.accessToken;
+      String? refreshToken = userProvider.refreshToken;
 
       try {
         // Call the update method in the ProductService
-        await ProductService()
-            .updateProduct(id, product_name, product_type, price, unit, token);
+        await ProductService().updateProduct(context, id, product_name,
+            product_type, price, unit, accessToken, refreshToken);
         // Navigate back after successful update
         Navigator.pushNamed(context, '/user_page');
       } catch (e) {

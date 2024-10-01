@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_lab1/model/user_model.dart';
+import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:flutter_lab1/varibles.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class AuthService {
   Future<User> login(String username, String password) async {
@@ -40,16 +43,23 @@ class AuthService {
     print(response.statusCode);
   }
 
-  Future<void> refreshToken(String refreshtoken) async {
+  Future<String?> refreshToken(
+      BuildContext context, String refreshtoken) async {
     final response = await http.post(Uri.parse('$apiURL/api/auth/refresh'),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"token": '$refreshtoken'}));
+        body: jsonEncode({"token": refreshtoken}));
+    print(response.body);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data['accessToken'];
+      String newAccessToken = data['accessToken'];
+
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.updateAccessToken(newAccessToken);
+      return newAccessToken;
     } else {
-      print('Error refreshing token: ${response.statusCode}');
+      print(
+          'Error refreshing token: ${response.statusCode} - ${response.body}');
       return null;
     }
   }
