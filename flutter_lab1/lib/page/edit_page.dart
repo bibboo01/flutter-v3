@@ -32,14 +32,15 @@ class _EditPageState extends State<EditPage> {
     String? refreshToken = userProvider.refreshToken;
     if (id.isNotEmpty) {
       final data = await ProductService()
-          .getproduct(context, id, accessToken, refreshToken);
+          .getproduct(context, id, accessToken!, refreshToken!);
       _productNameController.text = data.productName;
       _productTypeController.text = data.productType;
       _priceController.text = data.price.toString();
       _unitController.text = data.unit;
     }
   }
-   void _showDialog(String message) {
+
+  void _showDialog(String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -83,7 +84,7 @@ class _EditPageState extends State<EditPage> {
       try {
         // Call the update method in the ProductService
         await ProductService().updateProduct(context, id, product_name,
-            product_type, price, unit, accessToken, refreshToken);
+            product_type, price, unit, accessToken!, refreshToken!);
         // Navigate back after successful update
         Navigator.pushNamed(context, '/user_page');
         _showDialog('Edit Product Successful');

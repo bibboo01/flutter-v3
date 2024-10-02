@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
 import 'package:flutter_lab1/model/Product_model.dart';
@@ -10,10 +11,10 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  // Sample data for the DataTable
   List<productModel> _products = [];
   bool _isLoading = true;
   String? _errorMessage;
+  Timer? _timer;
 
   void _fetchAllProducts() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -21,7 +22,7 @@ class _UserPageState extends State<UserPage> {
     String? refreshToken = userProvider.refreshToken;
     try {
       final allProduct = await ProductService()
-          .getProducts(context, accessToken, refreshToken);
+          .getProducts(context, accessToken!, refreshToken!);
       setState(() {
         _products = allProduct;
         _isLoading = false;
@@ -29,14 +30,24 @@ class _UserPageState extends State<UserPage> {
     } catch (e) {
       setState(() {
         _isLoading = false; // Set loading to false
+        _errorMessage = e.toString(); // Set error message
       });
     }
   }
 
   @override
   void initState() {
-    _fetchAllProducts();
     super.initState();
+    _fetchAllProducts();
+    _timer = Timer.periodic(Duration(seconds: 2), (Timer t) {
+      _fetchAllProducts(); // Refetch every 2 seconds
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
   }
 
   @override
@@ -51,7 +62,7 @@ class _UserPageState extends State<UserPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: (){
+            onPressed: () {
               Navigator.pushNamed(context, '/post_page');
             },
           ),
@@ -128,8 +139,8 @@ class _UserPageState extends State<UserPage> {
     if (confirmDelete) {
       try {
         await ProductService()
-            .deleteProduct(context, productId, accessToken, refreshToken);
-        _fetchAllProducts();
+            .deleteProduct(context, productId, accessToken!, refreshToken!);
+        _fetchAllProducts(); // Refetch products after deletion
       } catch (e) {
         print('Error deleting product: $e');
       }

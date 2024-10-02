@@ -30,7 +30,7 @@ class _post_productState extends State<post_product> {
       String? refreshToken = userProvider.refreshToken;
 
       String? newToken =
-          await AuthService().refreshToken(context, refreshToken);
+          await AuthService().refreshToken(context, refreshToken!);
       if (newToken != null) {
         userProvider.updateAccessToken(newToken);
         accessToken = newToken;
@@ -40,7 +40,7 @@ class _post_productState extends State<post_product> {
 
       try {
         await ProductService().addProduct(context, productName, productType,
-            price!, unit, accessToken, refreshToken);
+            price!, unit, accessToken!, refreshToken);
         _showDialog('Add Product Successful');
 
         // Clear text fields after successful submission

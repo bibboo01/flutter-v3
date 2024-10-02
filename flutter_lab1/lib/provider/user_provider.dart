@@ -6,9 +6,9 @@ class UserProvider extends ChangeNotifier {
   String? _accessToken;
   String? _refreshToken;
 
-  String get user => _user!;
-  String get accessToken => _accessToken!;
-  String get refreshToken => _refreshToken!;
+  String? get user => _user;
+  String? get accessToken => _accessToken;
+  String? get refreshToken => _refreshToken;
 
   void saveUser(userModel UserModel, Token token) {
     _user = UserModel.userName;

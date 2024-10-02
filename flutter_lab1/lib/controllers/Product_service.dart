@@ -17,26 +17,26 @@ class ProductService {
         'Authorization': 'Bearer $accessToken',
       },
     );
-
+    print(response.statusCode);
     if (response.statusCode == 200) {
       final List<dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse
           .map((product) => productModel.fromJson(product))
           .toList();
     } else if (response.statusCode == 403) {
-      print('Access denied, logging out.');
-      Logout(context);
-      throw Exception('Access denied');
-    } else if (response.statusCode == 401) {
       final newAccessToken =
           await AuthService().refreshToken(context, refreshToken);
-      if (newAccessToken != null) {
+      if (newAccessToken != null && newAccessToken.isNotEmpty) {
         return await getProducts(context, newAccessToken, refreshToken);
       } else {
         print('Failed to refresh token, logging out.');
         Logout(context);
         throw Exception('Failed to refresh token');
       }
+    } else if (response.statusCode == 401) {
+      print('Access denied, logging out.');
+      Logout(context);
+      throw Exception('Access denied');
     } else {
       throw Exception('Failed to load products: ${response.statusCode}');
     }
@@ -58,19 +58,19 @@ class ProductService {
       print('Product fetched successfully');
       return productModel.fromJson(jsonDecode(response.body));
     } else if (response.statusCode == 403) {
-      print('Access denied, logging out.');
-      Logout(context);
-      throw Exception('Access denied');
-    } else if (response.statusCode == 401) {
       final newAccessToken =
           await AuthService().refreshToken(context, refreshToken);
-      if (newAccessToken != null) {
+      if (newAccessToken != null && newAccessToken.isNotEmpty) {
         return await getproduct(context, id, newAccessToken, refreshToken);
       } else {
         print('Failed to refresh token, logging out.');
         Logout(context);
         throw Exception('Failed to refresh token');
       }
+    } else if (response.statusCode == 401) {
+      print('Access denied, logging out.');
+      Logout(context);
+      throw Exception('Access denied');
     } else {
       throw Exception('Failed to fetch product: ${response.statusCode}');
     }
@@ -101,12 +101,19 @@ class ProductService {
     if (response.statusCode == 200) {
       print('Product Post successfully');
     } else if (response.statusCode == 403) {
+      final newAccessToken =
+          await AuthService().refreshToken(context, refreshToken);
+      if (newAccessToken != null && newAccessToken.isNotEmpty) {
+        addProduct(context, product_name, product_type, price, unit,
+            newAccessToken, refreshToken);
+      } else {
+        print('Failed to refresh token, logging out.');
+        Logout(context);
+        throw Exception('Failed to refresh token');
+      }
+    } else if (response.statusCode == 401) {
       Logout(context);
       print('logging out');
-    } else if (response.statusCode == 401) {
-      await AuthService().refreshToken(context, refreshToken);
-      addProduct(context, product_name, product_type, price, unit, accessToken,
-          refreshToken);
     }
   }
 
@@ -128,11 +135,18 @@ class ProductService {
     if (response.statusCode != 200) {
       throw Exception('Failed to delete product');
     } else if (response.statusCode == 403) {
+      final newAccessToken =
+          await AuthService().refreshToken(context, refreshToken!);
+      if (newAccessToken != null && newAccessToken.isNotEmpty) {
+        deleteProduct(context, id, newAccessToken, refreshToken);
+      } else {
+        print('Failed to refresh token, logging out.');
+        Logout(context);
+        throw Exception('Failed to refresh token');
+      }
+    } else if (response.statusCode == 401) {
       Logout(context);
       print('logging out');
-    } else if (response.statusCode == 401) {
-      await AuthService().refreshToken(context, refreshToken);
-      deleteProduct(context, id, accessToken, refreshToken);
     }
   }
 
@@ -158,15 +172,23 @@ class ProductService {
         "unit": unit
       }),
     );
+    print(response.statusCode);
     if (response.statusCode == 200) {
       print('Product updated successfully');
     } else if (response.statusCode == 403) {
+      final newAccessToken =
+          await AuthService().refreshToken(context, refreshToken);
+      if (newAccessToken != null && newAccessToken.isNotEmpty) {
+        updateProduct(context, id, product_name, product_type, price, unit,
+            newAccessToken, refreshToken);
+      } else {
+        print('Failed to refresh token, logging out.');
+        Logout(context);
+        throw Exception('Failed to refresh token');
+      }
+    } else if (response.statusCode == 401) {
       print('logging out');
       Logout(context);
-    } else if (response.statusCode == 401) {
-      await AuthService().refreshToken(context, refreshToken);
-      updateProduct(context, id, product_name, product_type, price, unit,
-          accessToken, refreshToken);
     }
   }
 

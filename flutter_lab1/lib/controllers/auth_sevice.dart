@@ -48,7 +48,7 @@ class AuthService {
     final response = await http.post(Uri.parse('$apiURL/api/auth/refresh'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"token": refreshtoken}));
-    print(response.body);
+    print(response.statusCode);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
