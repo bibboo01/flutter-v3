@@ -5,6 +5,8 @@ import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -27,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
 
         final String? role = UserModel.user.role;
 
-        _showLoginSuccessDialog(role!,role);
+        _showLoginSuccessDialog(role!, role);
         _usernameController.clear();
         _passwordController.clear();
       } catch (e) {
@@ -37,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _showLoginSuccessDialog(String _Role,String name) {
+  void _showLoginSuccessDialog(String _Role, String name) {
     if (_Role == 'Admin') {
       Navigator.pushReplacementNamed(context, '/admin_page');
     } else if (_Role == 'User') {
@@ -51,11 +53,11 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Login Successful'),
+          title: const Text('Login Successful'),
           content: Text('Welcome $name to Page'),
           actions: <Widget>[
             TextButton(
-              child: Center(child: Text('OK')),
+              child: const Center(child: Text('OK')),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
@@ -71,11 +73,11 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center(child: Text('Warning')),
+          title: const Center(child: Text('Warning')),
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: Center(child: Text('OK')),
+              child: const Center(child: Text('OK')),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
@@ -90,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -104,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: <Widget>[
                     TextFormField(
                       controller: _usernameController,
-                      decoration: InputDecoration(labelText: 'Username'),
+                      decoration: const InputDecoration(labelText: 'Username'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter a username';
@@ -114,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextFormField(
                       controller: _passwordController,
-                      decoration: InputDecoration(labelText: 'Password'),
+                      decoration: const InputDecoration(labelText: 'Password'),
                       obscureText: true,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -123,17 +125,17 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _login,
                       child: Text('Login'),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/register');
                       },
-                      child: Text('Register'),
+                      child: const Text('Register'),
                     ),
                   ],
                 ),

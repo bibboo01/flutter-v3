@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/auth_sevice.dart';
 
 class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -25,12 +27,12 @@ class _RegisterPageState extends State<RegisterPage> {
       try {
         await AuthService().register(username, password, role!, name);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Register successful')),
+          const SnackBar(content: Text('Register successful')),
         );
       } catch (e) {
         print(e);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Register Fail')),
+          const SnackBar(content: Text('Register Fail')),
         );
       }
       Navigator.pop(context);
@@ -79,7 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Wrap(
                 spacing: 8.0,
                 children: _roles.map((role) {
@@ -94,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   );
                 }).toList(),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _register,
                 child: Text('Register'),

@@ -11,11 +11,14 @@ import 'page/admin_page.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(create: (context) => UserProvider(), child: MyApp()),
+    ChangeNotifierProvider(
+        create: (context) => UserProvider(), child: const MyApp()),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

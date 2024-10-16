@@ -5,6 +5,8 @@ import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class post_product extends StatefulWidget {
+  const post_product({super.key});
+
   @override
   _post_productState createState() => _post_productState();
 }
@@ -52,7 +54,7 @@ class _post_productState extends State<post_product> {
       } catch (e) {
         print('Error adding product: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add product')),
+          const SnackBar(content: Text('Failed to add product')),
         );
       }
     }
@@ -63,11 +65,11 @@ class _post_productState extends State<post_product> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center(child: Text('System')),
+          title: const Center(child: Text('System')),
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: Center(child: Text('OK')),
+              child: const Center(child: Text('OK')),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },

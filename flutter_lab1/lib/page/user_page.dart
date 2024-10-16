@@ -7,6 +7,8 @@ import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class UserPage extends StatefulWidget {
+  const UserPage({super.key});
+
   @override
   State<UserPage> createState() => _UserPageState();
 }
@@ -40,7 +42,7 @@ class _UserPageState extends State<UserPage> {
   void initState() {
     super.initState();
     _fetchAllProducts();
-    _timer = Timer.periodic(Duration(seconds: 2), (Timer t) {
+    _timer = Timer.periodic(const Duration(seconds: 2), (Timer t) {
       _fetchAllProducts(); // Refetch every 2 seconds
     });
   }
@@ -55,14 +57,14 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           children: [
             Text('User Page'),
           ],
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: Logout,
           ),
         ],
@@ -72,11 +74,11 @@ class _UserPageState extends State<UserPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            Text('This is Product List'),
+            const Text('This is Product List'),
             const SizedBox(height: 20),
             Expanded(
               child: _isLoading
-                  ? Center(
+                  ? const Center(
                       child: CircularProgressIndicator()) // Loading indicator
                   : _errorMessage != null
                       ? Center(

@@ -5,6 +5,8 @@ import 'package:flutter_lab1/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class EditPage extends StatefulWidget {
+  const EditPage({super.key});
+
   @override
   _EditPageState createState() => _EditPageState();
 }
@@ -19,6 +21,7 @@ class _EditPageState extends State<EditPage> {
   final _priceController = TextEditingController();
   final _unitController = TextEditingController();
 
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final product = ModalRoute.of(context)!.settings.arguments
@@ -45,11 +48,11 @@ class _EditPageState extends State<EditPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center(child: Text('System')),
+          title: const Center(child: Text('System')),
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: Center(child: Text('OK')),
+              child: const Center(child: Text('OK')),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
@@ -72,7 +75,7 @@ class _EditPageState extends State<EditPage> {
       if (price == null) {
         // Show an error message if the price is invalid
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please enter a valid price.')),
+          const SnackBar(content: Text('Please enter a valid price.')),
         );
         return;
       }
@@ -100,7 +103,7 @@ class _EditPageState extends State<EditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome'),
+        title: const Text('Welcome'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -111,7 +114,7 @@ class _EditPageState extends State<EditPage> {
             children: <Widget>[
               TextFormField(
                 controller: _productNameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Product Name',
                 ),
                 validator: (value) {
@@ -123,7 +126,7 @@ class _EditPageState extends State<EditPage> {
               ),
               TextFormField(
                 controller: _productTypeController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Product Type',
                 ),
                 validator: (value) {
@@ -135,7 +138,7 @@ class _EditPageState extends State<EditPage> {
               ),
               TextFormField(
                 controller: _priceController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Price',
                 ),
                 keyboardType: TextInputType.number,
@@ -148,7 +151,7 @@ class _EditPageState extends State<EditPage> {
               ),
               TextFormField(
                 controller: _unitController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Unit',
                 ),
                 validator: (value) {
@@ -167,7 +170,7 @@ class _EditPageState extends State<EditPage> {
                         as productModel; // Change here
                     _updateProduct(product.id);
                   },
-                  child: Text('Submit'),
+                  child: const Text('Submit'),
                 ),
               ),
             ],
