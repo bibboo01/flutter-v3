@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
 import 'package:flutter_lab1/model/Product_model.dart';
@@ -32,8 +31,8 @@ class _UserPageState extends State<UserPage> {
       });
     } catch (e) {
       setState(() {
-        _isLoading = false; // Set loading to false
-        _errorMessage = e.toString(); // Set error message
+        _isLoading = false;
+        _errorMessage = e.toString();
       });
     }
   }
@@ -43,13 +42,13 @@ class _UserPageState extends State<UserPage> {
     super.initState();
     _fetchAllProducts();
     _timer = Timer.periodic(const Duration(seconds: 2), (Timer t) {
-      _fetchAllProducts(); // Refetch every 2 seconds
+      _fetchAllProducts();
     });
   }
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -57,40 +56,60 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Text('User Page'),
-          ],
-        ),
+        title: const Text('User Page'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: Logout,
           ),
         ],
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.deepPurple,
       ),
-      body: Padding(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepPurpleAccent.withOpacity(0.3), Colors.white],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            const Text('This is Product List'),
+            const Text(
+              'Product List',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator()) // Loading indicator
+                  ? const Center(child: CircularProgressIndicator())
                   : _errorMessage != null
-                      ? Center(
-                          child: Text('Error: $_errorMessage')) // Error message
+                      ? Center(child: Text('Error: $_errorMessage'))
                       : ListView.builder(
                           itemCount: _products.length,
                           itemBuilder: (context, index) {
                             final product = _products[index];
-                            return ListTile(
-                              title: Text(product.productName),
-                              subtitle: Text(
-                                "Type: ${product.productType} | Price: ${product.price} | Unit: ${product.unit}",
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              elevation: 3,
+                              child: ListTile(
+                                title: Text(
+                                  product.productName,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  "Type: ${product.productType}\nPrice: \$${product.price} | Unit: ${product.unit}",
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
                               ),
                             );
                           },

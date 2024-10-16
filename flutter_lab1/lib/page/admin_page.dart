@@ -31,8 +31,8 @@ class _AdminPageState extends State<AdminPage> {
       });
     } catch (e) {
       setState(() {
-        _isLoading = false; // Set loading to false
-        _errorMessage = e.toString(); // Set error message
+        _isLoading = false;
+        _errorMessage = e.toString();
       });
     }
   }
@@ -48,7 +48,7 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -56,69 +56,84 @@ class _AdminPageState extends State<AdminPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Text('Admin Page'),
-          ],
-        ),
+        title: const Text('Admin Page'),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, color: Colors.white),
             onPressed: () {
               Navigator.pushNamed(context, '/post_page');
             },
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: Logout,
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: _logout,
           ),
         ],
-        automaticallyImplyLeading: false,
       ),
-      body: Padding(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepPurpleAccent, Colors.white],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            const Text('This is Product List'),
+            const Text(
+              'This is Product List',
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator()) // Loading indicator
+                  ? const Center(child: CircularProgressIndicator())
                   : _errorMessage != null
-                      ? Center(
-                          child: Text('Error: $_errorMessage')) // Error message
+                      ? Center(child: Text('Error: $_errorMessage'))
                       : ListView.builder(
                           itemCount: _products.length,
                           itemBuilder: (context, index) {
                             final product = _products[index];
-                            return ListTile(
-                              title: Text(product.productName),
-                              subtitle: Text(
-                                "Type: ${product.productType} | Price: ${product.price} | Unit: ${product.unit}",
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/edit_page',
-                                        arguments: product,
-                                      );
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      // Implement delete logic here
-                                      _deleteProduct(
-                                          product.id, product.productName);
-                                    },
-                                  ),
-                                ],
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              elevation: 4,
+                              child: ListTile(
+                                title: Text(
+                                  product.productName,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text(
+                                  "Type: ${product.productType} | Price: ${product.price} | Unit: ${product.unit}",
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit),
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/edit_page',
+                                          arguments: product,
+                                        );
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () {
+                                        _deleteProduct(
+                                            product.id, product.productName);
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           },
@@ -130,19 +145,18 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
-  // Example delete method
   void _deleteProduct(String productId, String productName) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     String? accessToken = userProvider.accessToken;
     String? refreshToken = userProvider.refreshToken;
-    // Show confirmation dialog
+
     bool confirmDelete = await _showConfirmationDialog(productName);
 
     if (confirmDelete) {
       try {
         await ProductService()
             .deleteProduct(context, productId, accessToken!, refreshToken!);
-        _fetchAllProducts(); // Refetch products after deletion
+        _fetchAllProducts();
       } catch (e) {
         print('Error deleting product: $e');
       }
@@ -152,31 +166,31 @@ class _AdminPageState extends State<AdminPage> {
   Future<bool> _showConfirmationDialog(String productName) {
     return showDialog<bool>(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Confirm Deletion'),
-          content: Text('Are you sure you want to delete this $productName?'),
+          content: Text('Are you sure you want to delete $productName?'),
           actions: <Widget>[
             TextButton(
               child: Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop(false); // Return false if cancelled
+                Navigator.of(context).pop(false);
               },
             ),
             TextButton(
               child: Text('Delete'),
               onPressed: () {
-                Navigator.of(context).pop(true); // Return true if confirmed
+                Navigator.of(context).pop(true);
               },
             ),
           ],
         );
       },
-    ).then((value) => value ?? false); // Ensure a boolean is returned
+    ).then((value) => value ?? false);
   }
 
-  void Logout() {
+  void _logout() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider.onLogout();
     Navigator.pushNamed(context, '/');

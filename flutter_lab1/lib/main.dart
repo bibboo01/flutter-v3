@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         '/admin_page': (context) => AdminPage(),
         '/user_page': (context) => UserPage(),
         '/edit_page': (context) => EditPage(),
-        '/post_page': (context) => post_product(),
+        '/post_page': (context) => PostProduct(),
       },
     );
   }
