@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/controllers/Product_service.dart';
 import 'package:flutter_lab1/model/Product_model.dart';
@@ -56,16 +57,10 @@ class _UserPageState extends State<UserPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text('Home'),
+            Text('User Page'),
           ],
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, '/post_page');
-            },
-          ),
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: Logout,
@@ -77,7 +72,7 @@ class _UserPageState extends State<UserPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            Text('This is ProductPage'),
+            Text('This is Product List'),
             const SizedBox(height: 20),
             Expanded(
               child: _isLoading
@@ -95,29 +90,6 @@ class _UserPageState extends State<UserPage> {
                               subtitle: Text(
                                 "Type: ${product.productType} | Price: ${product.price} | Unit: ${product.unit}",
                               ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/edit_page',
-                                        arguments: product,
-                                      );
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      // Implement delete logic here
-                                      _deleteProduct(
-                                          product.id, product.productName);
-                                    },
-                                  ),
-                                ],
-                              ),
                             );
                           },
                         ),
@@ -126,52 +98,6 @@ class _UserPageState extends State<UserPage> {
         ),
       ),
     );
-  }
-
-  // Example delete method
-  void _deleteProduct(String productId, String productName) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    String? accessToken = userProvider.accessToken;
-    String? refreshToken = userProvider.refreshToken;
-    // Show confirmation dialog
-    bool confirmDelete = await _showConfirmationDialog(productName);
-
-    if (confirmDelete) {
-      try {
-        await ProductService()
-            .deleteProduct(context, productId, accessToken!, refreshToken!);
-        _fetchAllProducts(); // Refetch products after deletion
-      } catch (e) {
-        print('Error deleting product: $e');
-      }
-    }
-  }
-
-  Future<bool> _showConfirmationDialog(String productName) {
-    return showDialog<bool>(
-      context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirm Deletion'),
-          content: Text('Are you sure you want to delete this $productName?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(false); // Return false if cancelled
-              },
-            ),
-            TextButton(
-              child: Text('Delete'),
-              onPressed: () {
-                Navigator.of(context).pop(true); // Return true if confirmed
-              },
-            ),
-          ],
-        );
-      },
-    ).then((value) => value ?? false); // Ensure a boolean is returned
   }
 
   void Logout() {

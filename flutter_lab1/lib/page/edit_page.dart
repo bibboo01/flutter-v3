@@ -86,7 +86,7 @@ class _EditPageState extends State<EditPage> {
         await ProductService().updateProduct(context, id, product_name,
             product_type, price, unit, accessToken!, refreshToken!);
         // Navigate back after successful update
-        Navigator.pushNamed(context, '/user_page');
+        Navigator.pushNamed(context, '/admin_page');
         _showDialog('Edit Product Successful');
       } catch (e) {
         // Handle any errors during the update process

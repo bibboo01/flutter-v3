@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import './page/homepage.dart';
 import './page/register_page.dart';
 import './page/login_page.dart';
-import './page/admin_page.dart';
-import './page/user_page.dart';
+import 'page/user_page.dart';
+import 'page/admin_page.dart';
 
 void main() {
   runApp(

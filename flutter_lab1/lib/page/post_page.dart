@@ -48,7 +48,7 @@ class _post_productState extends State<post_product> {
         _productTypeController.clear();
         _priceController.clear();
         _unitController.clear();
-        Navigator.pushReplacementNamed(context, '/user_page');
+        Navigator.pushReplacementNamed(context, '/admin_page');
       } catch (e) {
         print('Error adding product: $e');
         ScaffoldMessenger.of(context).showSnackBar(
